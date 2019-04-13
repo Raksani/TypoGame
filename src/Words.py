@@ -1,7 +1,7 @@
 import arcade
 # from Typo import Typo
 WORD_LIST = [
-    "software", "computer", "java", "python", "arcade", "game", "laptop" , "www",
+    "software", "computer", "java", "python", "arcade", "game", "laptop", "www",
     "https", "glasses"
 ]
 class Words:

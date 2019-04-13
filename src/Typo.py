@@ -1,5 +1,9 @@
+import random
+
 import arcade
 import enum
+
+import src.Words
 
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
@@ -33,10 +37,19 @@ class Typo(arcade.Window):
         for word in self.word_list:
             word.draw()
 
+    #Find a row that's currently not occupied by another word.
+    def new_row(self):
+        row2 = set()
+        while True:
+            # margin between each row. span to fit the window
+            row = random.randrange(5)
+            for word in self.word_list:
+                row2.add(word.row)
+            if row not in row2:
+                break
 
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 600
-
+    #Find the word which has different in first letter with another word.
+    def
 
 def main():
     game = Typo(SCREEN_WIDTH, SCREEN_HEIGHT)
