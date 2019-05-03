@@ -9,9 +9,9 @@ class Words:
         self.words = words
         self.row = row
         self.x = screen_width
-        self.y = screen_height
+        self.y = screen_height - 40
         self.in_focus = False
-        self.color = None
+        self.color = arcade.color.WHITE
 
     def change_color(self):
         if self.in_focus:
@@ -20,8 +20,9 @@ class Words:
             self.color = arcade.color.WHITE
 
     def draw(self):
-        arcade.draw_text(self.word, self.x, self.y,self.color,14)
+        arcade.draw_text(self.words, self.x, self.y, self.color, 14)
 
     # decrease the word 1 by 1 by typing.
     def encounter(self):
         self.words = self.words[1:]
+
