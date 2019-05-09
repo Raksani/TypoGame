@@ -7,7 +7,7 @@ import src.Words
 
 
 SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 800
+SCREEN_HEIGHT = 600
 
 
 class GameStates(enum.Enum):
@@ -58,18 +58,29 @@ class Typo(arcade.Window):
     def show_word(self):
         self.word_list.add(self.word.Words(random.choice(self.word.WORD_LIST), random.randrange(20)
                                            , self.screen_width, self.screen_height))
-        # #Find a row that's currently not occupied by another word.
-        # def new_row(self):
-        #     row2 = set()
-        #     while True:
-        #         # margin between each row. span to fit the window
-        #         row = random.randrange(5)
-        #         for word in self.word_list:
-        #             row2.add(word.row)
-        #         if row not in row2:
-        #             break
+        #Find a row that's currently not occupied by another word.
+        #to prevent showing every word in the same row which maybe cause overlapping.
 
-        # Find the word which has different in first letter with another word.
+        used_row = set()
+        while True:
+            random_row = random.randrange(10)
+            for word in self.word_list:
+                used_row.add(word.row)
+
+            # The row I want should be unused
+            if used_row not in used_row:
+                break
+
+        # Find the word which has different in the first character with another word.
+        used_char = set()
+        for word in self.word_list:
+            used_char.add(word.words[0])
+
+        while True:
+            random_word = random.choice(self.word.WORD_LIST)
+            # The word I want should not have the same first character as another word.
+            if random_word not in used_char:
+                break
 
     def update(self, delta_time: float):
         if self.state == GameStates.RUNNING:
@@ -92,8 +103,6 @@ class Typo(arcade.Window):
                 self.state = GameStates.GAME_OVER
 
 
-
-
     def on_key_press(self, key, modifiers):
         #start with no focus word (didn't type any keys yet)
         if self.focus_word is None:
@@ -113,14 +122,14 @@ class Typo(arcade.Window):
                 #remove that one
                 self.focus_word.encounter()
                 #in case of no more letters in focused word left
-                if self.focus_word.words is None:
+                if self.focus_word.words == "":
                     #remove that word from the list
                     # (It won't show the same word player has played)
                     self.word_list.discard(self.focus_word)
                     #reset focus_word
                     self.focus_word = None
                     #increase score by 1
-                    self.score +=1
+                    self.score += 1
                     #continue
                     self.show_word()
 
