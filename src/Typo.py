@@ -72,9 +72,27 @@ class Typo(arcade.Window):
         # Find the word which has different in first letter with another word.
 
     def update(self, delta_time: float):
-        for word in self.word_list:
-            # to decrease the x-range makes the word looks like moving to the left.
-            word.x -= 1
+        if self.state == GameStates.RUNNING:
+            for word in self.word_list:
+                # to decrease the x-range makes the word looks like moving to the left.
+                word.x -= 1
+                #in case of the word has been left the window.
+                if word.x < 0:
+                    #loss the word, loss 1 life.
+                    self.lives -= 1
+                    #reset the focus word
+                    if word == self.focus_word:
+                        self.focus_word is None
+                    #remove that word from word list to prevent duplication when it picks the same word to show again.
+                    self.word_list.discard(word)
+                    #continue
+                    self.show_word()
+            # died
+            if self.lives <= 0:
+                self.state = GameStates.GAME_OVER
+
+
+
 
     def on_key_press(self, key, modifiers):
         #start with no focus word (didn't type any keys yet)
