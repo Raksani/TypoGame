@@ -5,6 +5,7 @@ import enum
 
 import src.Words
 
+
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 800
 
@@ -17,19 +18,17 @@ class GameStates(enum.Enum):
 class Typo(arcade.Window):
     def __init__(self, width, height):
         super().__init__(width, height, title="Typo Game")
-        self.state = GameStates.RUNNING
 
         # change background if have time.
         arcade.set_background_color(arcade.color.BLACK)
-
         self.screen_width = width
         self.screen_height = height
-
         self.score = int()
         self.lives = int()
         self.focus_word = None  # The word that is currently being typed.
         self.word_list = set()
         self.state = None
+        self.word = src.Words
 
     def setup(self):
         self.score = 0
@@ -51,9 +50,14 @@ class Typo(arcade.Window):
 
     def on_draw(self):
         arcade.start_render()
+
         if self.state == GameStates.RUNNING:
             self.start_game()
 
+
+    def show_word(self):
+        self.word_list.add(self.word.Words(random.choice(self.word.WORD_LIST), random.randrange(20)
+                                           , self.screen_width, self.screen_height))
         # #Find a row that's currently not occupied by another word.
         # def new_row(self):
         #     row2 = set()
@@ -67,14 +71,46 @@ class Typo(arcade.Window):
 
         # Find the word which has different in first letter with another word.
 
-    def show_word(self):
-        self.word_list.add(src.Words.Words(random.choice(src.Words.WORD_LIST), random.randrange(20)
-                                           , self.screen_width, self.screen_height))
-
     def update(self, delta_time: float):
         for word in self.word_list:
             # to decrease the x-range makes the word looks like moving to the left.
             word.x -= 1
+
+    def on_key_press(self, key, modifiers):
+        #start with no focus word (didn't type any keys yet)
+        if self.focus_word is None:
+            #loop the word out
+            for word in self.word_list:
+                # the first character of the word = key
+                if word.words[0] == chr(key):
+                    #change color
+                    self.focus_word = word
+                    #remove that letter
+                    word.encounter()
+                    word.in_focus = True
+                    break
+        else:
+            #in case of the first character of focused word = key
+            if self.focus_word.words[0] == chr(key):
+                #remove that one
+                self.focus_word.encounter()
+                #in case of no more letters in focused word left
+                if self.focus_word.words is None:
+                    #remove that word from the list
+                    # (It won't show the same word player has played)
+                    self.word_list.discard(self.focus_word)
+                    #reset focus_word
+                    self.focus_word = None
+                    #increase score by 1
+                    self.score +=1
+                    #continue
+                    self.show_word()
+
+
+
+
+
+
 
 
 def main():
