@@ -45,14 +45,21 @@ class Typo(arcade.Window):
         arcade.draw_text(f"Live(s): {self.lives}", self.screen_width - 15, 15,
                          arcade.color.RADICAL_RED, 15, align="right", anchor_x="right", anchor_y="baseline")
 
+    def end_game(self):
+        
+
+
     def on_draw(self):
         arcade.start_render()
 
         if self.state == GameStates.RUNNING:
             self.start_game()
+        else:
+            self.end_game()
 
 
     def show_word(self):
+
         #Find a row that's currently not occupied by another word.
         #to prevent showing every word in the same row which maybe cause overlapping.
         randrow = int()
