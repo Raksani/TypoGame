@@ -9,7 +9,7 @@ class Words:
         self.words = words
         self.row = row
         self.x = screen_width
-        self.y = screen_height - 40
+        self.y = (int((screen_height - 50) / 20) * row) + 50
         self.in_focus = False
         self.color = arcade.color.WHITE
 
