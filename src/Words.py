@@ -22,7 +22,7 @@ class Words:
     def draw(self):
         arcade.draw_text(self.words, self.x, self.y, self.color, 14)
 
-    # decrease the word 1 by 1 by typing.
+    # decrease/remove a word 1 by 1 per 1 key pressed.
     def encounter(self):
         self.words = self.words[1:]
 
