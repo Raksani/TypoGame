@@ -2,6 +2,7 @@ import random
 import arcade
 import enum
 import src.Words
+import src.Cloud
 
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
@@ -16,8 +17,8 @@ class Typo(arcade.Window):
     def __init__(self, width, height):
         super().__init__(width, height, title="Typo Game")
 
-        # change background if have time.
-        arcade.set_background_color(arcade.color.BLACK)
+        # file_path = os.path.dirname(os.path.abspath(__file__))
+        # os.chdir(file_path)
 
         self.screen_width = width
         self.screen_height = height
@@ -26,6 +27,9 @@ class Typo(arcade.Window):
         self.focus_word = None  # The word that is currently being typed.
         self.word_list = set()
         self.state = None
+        self.background = None
+        # set of cloud list
+        self.cloud_list = set()
 
     def setup(self):
         self.score = 0
@@ -33,9 +37,16 @@ class Typo(arcade.Window):
         self.focus_word = None  # The word that is currently being typed.
         self.word_list = set()
         self.state = GameStates.RUNNING
+        self.background = arcade.load_texture(".././images/background1.png")
+        # set of cloud list
+        self.cloud_list = set()
 
         for i in range(5):
             self.show_word()
+
+        # for in range to show the clouds
+        for i in range(40):
+            self.show_cloud()
 
     def start_game(self):
         for word in self.word_list:
@@ -46,22 +57,43 @@ class Typo(arcade.Window):
                          arcade.color.RADICAL_RED, 15, align="right", anchor_x="right", anchor_y="baseline")
 
     def end_game(self):
-        
+        arcade.draw_text("GAME OVER",
+                         self.screen_width / 2, (self.screen_height / 2) + 60,
+                         arcade.color.WHITE, 54,
+                         align="center", anchor_x="center", anchor_y="center"
+                         )
 
+        arcade.draw_text("Press SPACE BAR to restart",
+                         self.screen_width / 2, (self.screen_height / 2),
+                         arcade.color.WHITE, 24,
+                         align="center", anchor_x="center", anchor_y="center"
+                         )
+
+        arcade.draw_text(f"Current score : {self.score}", 15, 15, arcade.color.WHITE, 14, )
 
     def on_draw(self):
         arcade.start_render()
+
+        # for cloud in cloud list to draw the cloud
+        for cloud in self.cloud_list:
+            cloud.draw()
+
+        arcade.draw_texture_rectangle(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2,
+                                      SCREEN_WIDTH, SCREEN_HEIGHT, self.background)
 
         if self.state == GameStates.RUNNING:
             self.start_game()
         else:
             self.end_game()
 
+    # def to show all the cloud by adding to the list as same as show word
+    def show_cloud(self):
+        self.cloud_list.add(src.Cloud.Cloud(self.screen_width, self.screen_height))
 
     def show_word(self):
 
-        #Find a row that's currently not occupied by another word.
-        #to prevent showing every word in the same row which maybe cause overlapping.
+        # Find a row that's currently not occupied by another word.
+        # to prevent showing every word in the same row which maybe cause overlapping.
         randrow = int()
         used_row = set()
         while True:
@@ -88,76 +120,87 @@ class Typo(arcade.Window):
         self.word_list.add(src.Words.Words(randword, randrow, self.screen_width, self.screen_height))
 
     def update(self, delta_time: float):
+
+        # to move the cloud
+        # for cloud in cloud list then move x as same as the word but use cloud speed instead of 1
+        # if x<0; reset the cloud pos.
+        for cloud in self.cloud_list:
+            cloud.x -= cloud.speed
+            if cloud.x < 0:
+                cloud.reset_position(self.screen_width, self.screen_height)
+
         if self.state == GameStates.RUNNING:
             for word in self.word_list:
 
                 # to decrease the x-range makes the word looks like moving to the left.
-                word.x -= 1
+                word.x -= 1.25
 
-                #in case of the word has been left the window.
+                # in case of the word has been left the window.
                 if word.x < 0:
 
-                    #loss the word, loss 1 life.
+                    # loss the word, loss 1 life.
                     self.lives -= 1
 
-                    #reset the focus word
+                    # reset the focus word
                     if self.focus_word == word:
                         self.focus_word = None
 
-                    #remove that word from word list to prevent duplication when it picks the same word to show again.
+                    # remove that word from word list to prevent duplication when it picks the same word to show again.
                     self.word_list.discard(word)
 
-                    #continue
+                    # continue
                     self.show_word()
 
             # died
             if self.lives <= 0:
                 self.state = GameStates.GAME_OVER
 
-
     def on_key_press(self, key, modifiers):
-        #other keys
+        # other keys
         if key > 127:
             return
 
-        #start with no focus word (didn't type any keys yet)
+        # if game over and player presses space bar.
+        if self.state == GameStates.GAME_OVER and key == 32:
+            self.setup()
+            self.state = GameStates.RUNNING
+
+        # start with no focus word (didn't type any keys yet)
         if self.focus_word is None:
 
-            #loop the word out
+            # loop the word out
             for w in self.word_list:
 
                 # the first character of the word = key
                 if w.words[0] == chr(key):
-
-                    #change color
+                    # change color
                     self.focus_word = w
 
-                    #remove that letter
+                    # remove that letter
                     w.encounter()
 
                     w.in_focus = True
                     break
         else:
-            #in case of the first character of focused word = key
+            # in case of the first character of focused word = key
             if self.focus_word.words[0] == chr(key):
 
-                #remove that one
+                # remove that one
                 self.focus_word.encounter()
 
-                #in case of no more letters in focused word left
+                # in case of no more letters in focused word left
                 if self.focus_word.words == "":
-
-                    #remove that word from the list
+                    # remove that word from the list
                     # (It won't show the same word player has played)
                     self.word_list.discard(self.focus_word)
 
-                    #reset focus_word
+                    # reset focus_word
                     self.focus_word = None
 
-                    #increase score by 1
+                    # increase score by 1
                     self.score += 1
 
-                    #continue
+                    # continue
                     self.show_word()
 
 
