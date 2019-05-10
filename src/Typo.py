@@ -12,6 +12,7 @@ hit = pygame.mixer.Sound('.././soundEffect/hit.wav')
 
 music = pygame.mixer.music.load('.././soundEffect/backgroundmusic.wav')
 pygame.mixer.music.play(-1)
+pygame.mixer.music.set_volume(0.5)
 
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
@@ -57,6 +58,8 @@ class Typo(arcade.Window):
         for i in range(40):
             self.show_cloud()
 
+
+
     def start_game(self):
         for word in self.word_list:
             word.draw()
@@ -89,6 +92,7 @@ class Typo(arcade.Window):
         # for cloud in cloud list to draw the cloud
         for cloud in self.cloud_list:
             cloud.draw_cloud()
+
 
         if self.state == GameStates.RUNNING:
             self.start_game()
@@ -207,7 +211,7 @@ class Typo(arcade.Window):
                     self.focus_word = None
 
                     # increase score by 1
-                    self.score += 1
+                    self.score += 10
 
                     # continue
                     self.show_word()
