@@ -3,6 +3,15 @@ import arcade
 import enum
 import src.Words
 import src.Cloud
+import pygame
+
+pygame.mixer.init()
+
+# Sound effect initialise
+hit = pygame.mixer.Sound('.././soundEffect/hit.wav')
+
+music = pygame.mixer.music.load('.././soundEffect/backgroundmusic.wav')
+pygame.mixer.music.play(-1)
 
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
@@ -74,12 +83,12 @@ class Typo(arcade.Window):
     def on_draw(self):
         arcade.start_render()
 
-        # for cloud in cloud list to draw the cloud
-        for cloud in self.cloud_list:
-            cloud.draw()
-
         arcade.draw_texture_rectangle(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2,
                                       SCREEN_WIDTH, SCREEN_HEIGHT, self.background)
+
+        # for cloud in cloud list to draw the cloud
+        for cloud in self.cloud_list:
+            cloud.draw_cloud()
 
         if self.state == GameStates.RUNNING:
             self.start_game()
@@ -119,13 +128,13 @@ class Typo(arcade.Window):
                 break
         self.word_list.add(src.Words.Words(randword, randrow, self.screen_width, self.screen_height))
 
-    def update(self, delta_time: float):
+    def update(self, delta_time):
 
         # to move the cloud
         # for cloud in cloud list then move x as same as the word but use cloud speed instead of 1
         # if x<0; reset the cloud pos.
         for cloud in self.cloud_list:
-            cloud.x -= cloud.speed
+            cloud.x -= cloud.speed * delta_time
             if cloud.x < 0:
                 cloud.reset_position(self.screen_width, self.screen_height)
 
@@ -159,7 +168,7 @@ class Typo(arcade.Window):
         # other keys
         if key > 127:
             return
-
+        hit.play()
         # if game over and player presses space bar.
         if self.state == GameStates.GAME_OVER and key == 32:
             self.setup()
